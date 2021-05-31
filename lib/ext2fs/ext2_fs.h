@@ -51,6 +51,7 @@
 /*
  * Special inode numbers
  */
+#define EXT2_NUM_JOURNALS 256
 #define EXT2_BAD_INO		 1	/* Bad blocks inode */
 #define EXT2_ROOT_INO		 2	/* Root inode */
 #define EXT4_USR_QUOTA_INO	 3	/* User quota inode */
@@ -59,11 +60,11 @@
 #define EXT2_UNDEL_DIR_INO	 6	/* Undelete directory inode */
 #define EXT2_RESIZE_INO		 7	/* Reserved group descriptors inode */
 #define EXT2_JOURNAL_INO	 8	/* Journal inode */
-#define EXT2_EXCLUDE_INO	 9	/* The "exclude" inode, for snapshots */
-#define EXT4_REPLICA_INO	10	/* Used by non-upstream feature */
+#define EXT2_EXCLUDE_INO     9+EXT2_NUM_JOURNALS    /* The "exclude" inode, for snapshots (original: 9) */
+#define EXT4_REPLICA_INO    10+EXT2_NUM_JOURNALS    /* Used by non-upstream feature  (original: 10) */
 
-/* First non-reserved inode for old ext2 filesystems */
-#define EXT2_GOOD_OLD_FIRST_INO	11
+/* First non-reserved inode for old ext2 filesystems (original: 11) */
+#define EXT2_GOOD_OLD_FIRST_INO 11+EXT2_NUM_JOURNALS
 
 /*
  * The second extended file system magic number
@@ -696,7 +697,7 @@ struct ext2_super_block {
 	 * Journaling support valid if EXT2_FEATURE_COMPAT_HAS_JOURNAL set.
 	 */
 /*0d0*/	__u8	s_journal_uuid[16];	/* uuid of journal superblock */
-/*0e0*/	__u32	s_journal_inum;		/* inode number of journal file */
+/*0e0*/	__u32	s_journal_inum_none;		/* inode number of journal file */
 	__u32	s_journal_dev;		/* device number of journal file */
 	__u32	s_last_orphan;		/* start of list of inodes to delete */
 /*0ec*/	__u32	s_hash_seed[4];		/* HTREE hash seed */
@@ -760,6 +761,8 @@ struct ext2_super_block {
 	__le16	s_encoding_flags;	/* Filename charset encoding flags */
 	__le32	s_reserved[95];		/* Padding to the end of the block */
 /*3fc*/	__u32	s_checksum;		/* crc32c(superblock) */
+#define s_journal_inum _s_journal_inum[0]
+    __u32 _s_journal_inum[EXT2_NUM_JOURNALS];
 };
 
 #define EXT4_S_ERR_LEN (EXT4_S_ERR_END - EXT4_S_ERR_START)

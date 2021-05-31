@@ -362,11 +362,45 @@ static void print_inline_journal_information(ext2_filsys fs)
 	struct ext2_inode	inode;
 	ext2_file_t		journal_file;
 	errcode_t		retval;
-	ino_t			ino = fs->super->s_journal_inum;
+	ino_t			ino;
+	int			i;
 	char			buf[1024];
 
-	if (fs->flags & EXT2_FLAG_IMAGE_FILE)
-		return;
+	for (i = 0; i < EXT2_NUM_JOURNALS; i++) {
+		if(!(ino = fs->super->_s_journal_inum[i]))
+			return;
+
+		if (fs->flags & EXT2_FLAG_IMAGE_FILE)
+			return;
+		retval = ext2fs_read_inode(fs, ino,  &inode);
+		if (retval) {
+			com_err(program_name, retval, "%s",
+					_("while reading journal inode"));
+			exit(1);
+		}
+		retval = ext2fs_file_open2(fs, ino, &inode, 0, &journal_file);
+		if (retval) {
+			com_err(program_name, retval, "%s",
+					_("while opening journal inode"));
+			exit(1);
+		}
+		retval = ext2fs_file_read(journal_file, buf, sizeof(buf), 0);
+		if (retval) {
+			com_err(program_name, retval, "%s",
+					_("while reading journal super block"));
+			exit(1);
+		}
+		ext2fs_file_close(journal_file);
+		jsb = (journal_superblock_t *) buf;
+		if (be32_to_cpu(jsb->s_header.h_magic) != JFS_MAGIC_NUMBER) {
+			fprintf(stderr, "%s",
+					_("Journal superblock magic number invalid!\n"));
+			exit(1);
+		}
+		fprintf(stdout, "%s %lu\n", "Journal inode num:       ", ino);
+		e2p_list_journal_super(stdout, buf, fs->blocksize, 0);
+	}
+
 	retval = ext2fs_read_inode(fs, ino,  &inode);
 	if (retval) {
 		com_err(program_name, retval, "%s",

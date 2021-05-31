@@ -443,6 +443,11 @@ errcode_t ext2fs_add_journal_inode2(ext2_filsys fs, blk_t num_blocks,
 	char			jfile[1024];
 	int			mount_flags;
 	int			fd = -1;
+	int			num_journals = 1, i;
+
+	if (flags & EXT2_MKJOURNAL_MULTI) {
+		num_journals = sysconf(_SC_NPROCESSORS_ONLN);
+	}
 
 	if (flags & EXT2_MKJOURNAL_NO_MNT_CHECK)
 		mount_flags = 0;
@@ -526,13 +531,23 @@ errcode_t ext2fs_add_journal_inode2(ext2_filsys fs, blk_t num_blocks,
 			retval = EBUSY;
 			goto errout;
 		}
-		journal_ino = EXT2_JOURNAL_INO;
-		if ((retval = write_journal_inode(fs, journal_ino,
-						  num_blocks, goal, flags)))
-			return retval;
+
+		/*Per-Core Journal*/
+		for (i = 0; i < num_journals ; i++) {
+			journal_ino = EXT2_JOURNAL_INO + i;
+			if ((retval = write_journal_inode(fs, journal_ino,
+							num_blocks, goal, flags))) {
+				if (retval == EEXIST) {
+					i++;
+					continue;
+				}
+				return retval;
+			}
+
+			fs->super->_s_journal_inum[i] = journal_ino;
+		}
 	}
 
-	fs->super->s_journal_inum = journal_ino;
 	fs->super->s_journal_dev = 0;
 	memset(fs->super->s_journal_uuid, 0,
 	       sizeof(fs->super->s_journal_uuid));

@@ -10,6 +10,7 @@
  * %End-Header%
  */
 
+long num_journals;
 extern int	 journal_size;
 extern int	 journal_flags;
 extern char	*journal_device;

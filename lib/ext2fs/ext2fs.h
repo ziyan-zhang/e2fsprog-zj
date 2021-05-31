@@ -42,8 +42,10 @@ extern "C" {
  * (some versions have the padding set up so that the superblock is
  * 1032 bytes long).
  */
-#define SUPERBLOCK_OFFSET	1024
-#define SUPERBLOCK_SIZE		1024
+#define SUPERBLOCK_OFFSET	sizeof(struct ext2_super_block)
+#define SUPERBLOCK_SIZE		sizeof(struct ext2_super_block)
+//#define SUPERBLOCK_OFFSET	1024
+//#define SUPERBLOCK_SIZE		1024
 
 #define UUID_STR_SIZE 37
 
@@ -219,6 +221,7 @@ typedef struct ext2_file *ext2_file_t;
 #define EXT2_MKJOURNAL_V1_SUPER	0x0000001 /* create V1 superblock (deprecated) */
 #define EXT2_MKJOURNAL_LAZYINIT	0x0000002 /* don't zero journal inode before use*/
 #define EXT2_MKJOURNAL_NO_MNT_CHECK 0x0000004 /* don't check mount status */
+#define EXT2_MKJOURNAL_MULTI 0x0000008
 
 struct blk_alloc_ctx;
 struct opaque_ext2_group_desc;

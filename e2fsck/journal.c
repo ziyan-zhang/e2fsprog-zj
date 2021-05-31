@@ -812,6 +812,7 @@ errcode_t e2fsck_check_ext3_journal(e2fsck_t ctx)
 	clear_problem_context(&pctx);
 	pctx.num = sb->s_journal_inum;
 
+	printf("journal inum: %d\n", sb->_s_journal_inum[1]);
 	retval = e2fsck_get_journal(ctx, &journal);
 	if (retval) {
 		if ((retval == EXT2_ET_BAD_INODE_NUM) ||

@@ -209,6 +209,11 @@ void parse_journal_opts(const char *opts)
 		} else if (strcmp(token, "v1_superblock") == 0) {
 			journal_flags |= EXT2_MKJOURNAL_V1_SUPER;
 			continue;
+		} else if (strcmp(token, "multi_journal") == 0) {
+			journal_flags |= EXT2_MKJOURNAL_MULTI;
+			num_journals = sysconf(_SC_NPROCESSORS_ONLN) > EXT2_NUM_JOURNALS ?\
+						EXT2_NUM_JOURNALS : sysconf(_SC_NPROCESSORS_ONLN);
+			continue;
 		} else
 			journal_usage++;
 	}

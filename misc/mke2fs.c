@@ -3328,8 +3328,8 @@ int main (int argc, char *argv[])
 			goto no_journal;
 		}
 		if (!quiet) {
-			printf(_("Creating journal (%u blocks): "),
-			       journal_blocks);
+			printf(_("Creating %d journals: "),
+					journal_flags & EXT2_MKJOURNAL_MULTI ? num_journals : 1);
 			fflush(stdout);
 		}
 		retval = ext2fs_add_journal_inode2(fs, journal_blocks,
