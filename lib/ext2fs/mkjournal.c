@@ -544,8 +544,9 @@ errcode_t ext2fs_add_journal_inode2(ext2_filsys fs, blk_t num_blocks,
 				return retval;
 			}
 
-			fs->super->_s_journal_inum[i] = journal_ino;
 		}
+		fs->super->_s_journal_inum[0] = EXT2_JOURNAL_INO;
+		fs->super->_s_journal_inum[1] = num_journals;
 	}
 
 	fs->super->s_journal_dev = 0;
