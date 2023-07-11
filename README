@@ -1,4 +1,9 @@
-	This is the new version (1.45.3) of the second extended file
+# 我的注释
+这个库用gcc11（ubuntu22默认）编译会提示num_journals的重定义；用gcc8编译正常。
+gcc11编译元胤稍微改了include和/或变量extern定义就能正常编译了有时间试下。
+
+# 以下是作者的原文档
+This is the new version (1.45.3) of the second extended file
 system management programs.
 
 	From time to time, I release new versions of e2fsprogs, to fix
